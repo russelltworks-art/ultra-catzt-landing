@@ -93,6 +93,9 @@ export interface CMSContentSchema {
     backgroundMediaUrl: string;
     brandWatermarkUrl?: string;
     featuredVideoUrl?: string;
+    heroLogoUrl?: string;
+    heroBackground3DUrl?: string;
+    kineticSlideImages?: string[];
   };
   aPropos: {
     title: string;
@@ -391,6 +394,18 @@ export const DEFAULT_CMS_CONTENT: CMSContentSchema = {
     backgroundMediaUrl: '/images/Catzt-logo.png',
     brandWatermarkUrl: '/images/Catzt-logo.png',
     featuredVideoUrl: '',
+    heroLogoUrl: '/images/Catzt-logo.png',
+    heroBackground3DUrl: '/wp-content/themes/omnicom/assets/images/home-hero.png',
+    kineticSlideImages: [
+      '/wp-content/themes/omnicom/assets/images/picture-full/image9.jpg',
+      '/wp-content/themes/omnicom/assets/images/picture-full/image10.jpg',
+      '/wp-content/themes/omnicom/assets/images/picture-full/image11.jpg',
+      '/wp-content/themes/omnicom/assets/images/picture-full/image12.jpg',
+      '/wp-content/themes/omnicom/assets/images/picture-full/image13.jpg',
+      '/wp-content/themes/omnicom/assets/images/picture-full/image14.jpg',
+      '/wp-content/themes/omnicom/assets/images/picture-full/image15.jpg',
+      '/wp-content/themes/omnicom/assets/images/picture-full/image16.jpg',
+    ],
   },
   aPropos: {
     title: 'A propos',

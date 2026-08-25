@@ -52,7 +52,11 @@ export class LandingHydrator {
     // 1. Dynamic SEO, Social Cards, JSON-LD & Verification Tags
     this.applySEO(c);
 
-    // 2. Hero & Homepage
+    // 2. Hero & Homepage 3D Particles & Kinetic Slides
+    if (typeof window !== 'undefined' && c.hero?.kineticSlideImages) {
+      (window as any).__CATZT_KINETIC_SLIDES__ = c.hero.kineticSlideImages;
+    }
+
     this.setText('[data-cms-key="hero.subtitle"], .wp-block-omnicom-portal .subtitle', c.hero?.subtitle);
     this.setText('[data-cms-key="hero.headline"], .wp-block-omnicom-portal h2', c.hero?.headline);
     this.setText('[data-cms-key="hero.ctaPrimary"], .wp-block-omnicom-portal a.primary-btn', c.hero?.ctaPrimaryText);

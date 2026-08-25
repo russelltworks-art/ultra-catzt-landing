@@ -5,7 +5,7 @@ import { resolve } from 'path';
 // https://vitejs.dev/config/
 export default defineConfig({
   root: resolve(__dirname),
-  envDir: resolve(__dirname, '../..'),
+  envDir: resolve(__dirname),
   appType: 'mpa',
   plugins: [react()],
   define: {
@@ -21,15 +21,7 @@ export default defineConfig({
     port: 7700,
     strictPort: true,
     fs: {
-      allow: [resolve(__dirname, '../..')],
-    },
-    headers: {
-      'Cache-Control': 'no-store, no-cache, must-revalidate',
-      'Pragma': 'no-cache',
-      'Expires': '0',
-    },
-    watch: {
-      ignored: [],
+      allow: [resolve(__dirname)],
     },
   },
   build: {
@@ -56,9 +48,9 @@ export default defineConfig({
         expIntel: resolve(__dirname, 'expertises/intelligence-strategique/index.html'),
       },
       output: {
-        entryFileNames: 'assets/[name]-[hash].js',
-        chunkFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash].[ext]',
+        entryFileNames: 'assets/catzt-[name]-v2-[hash].js',
+        chunkFileNames: 'assets/catzt-[name]-v2-[hash].js',
+        assetFileNames: 'assets/catzt-[name]-v2-[hash].[ext]',
       },
     },
   },

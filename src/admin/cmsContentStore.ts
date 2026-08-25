@@ -256,12 +256,12 @@ export const DEFAULT_CMS_CONTENT: CMSContentSchema = {
     publishedBy: 'Catzt Admin',
   },
   global: {
-    siteTitle: 'Catzt Office — Systemic Control for Multi-Marketplace Operations',
-    brandName: 'Catzt Office',
-    contactEmail: 'contact@catztoffice.com',
-    contactPhone: '+33 (0)1 53 32 60 00',
-    officeAddress: '73-75 rue la Condamine, 75017 Paris',
-    cookieBannerText: 'Nous utilisons des cookies pour améliorer votre expérience, analyser le trafic et personnaliser le contenu.',
+    siteTitle: 'Catzt OS — Systemic Control for Multi-Marketplace Operations',
+    brandName: 'Catzt OS',
+    contactEmail: 'hello@catzt.com',
+    contactPhone: '+62 858 7711 1559',
+    officeAddress: 'Tangerang, Indonesia',
+    cookieBannerText: 'Kami menggunakan cookie penting untuk kenyamanan dan performa navigasi Anda.',
     adminPassword: 'catzt2026',
   },
   pagesSEO: {
@@ -424,11 +424,11 @@ export const DEFAULT_CMS_CONTENT: CMSContentSchema = {
     bannerImageUrl: '/wp-content/uploads/2025/12/omnicom-nousrejoindre-1.jpg',
   },
   contact: {
-    headline: 'Vous avez une question, un projet ou un enjeu stratégique ?',
-    officeCity: 'Paris',
-    officeAddress: '73-75 rue la Condamine, 75017 Paris',
-    telephone: '+33 (0)1 53 32 60 00',
-    email: 'contact@catztoffice.com',
+    headline: 'Punya pertanyaan atau ingin mendiskusikan kebutuhan operasional bisnis Anda?',
+    officeCity: 'Tangerang',
+    officeAddress: 'Tangerang, Indonesia',
+    telephone: '+62 858 7711 1559',
+    email: 'hello@catzt.com',
   },
 };
 

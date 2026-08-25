@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   CMSContentStore,
   CMSContentSchema,
@@ -21,6 +21,7 @@ import { GlobalSettingsEditor } from './sections/GlobalSettingsEditor';
 import { MediaLibraryView } from './sections/MediaLibraryView';
 import { SocialIntegrationsEditor } from './sections/SocialIntegrationsEditor';
 import { VisualSectionBuilder } from './components/VisualSectionBuilder';
+import { GripVertical } from 'lucide-react';
 
 export const AdminCMSDashboard: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() =>
@@ -31,6 +32,14 @@ export const AdminCMSDashboard: React.FC = () => {
   const [saveStatus, setSaveStatus] = useState<string>('');
   const [lastPublished, setLastPublished] = useState<string>('');
   const [viewMode, setViewMode] = useState<'editor' | 'split' | 'preview'>('split');
+
+  // Draggable Split Pane Width (persisted in localStorage)
+  const [splitRatio, setSplitRatio] = useState<number>(() => {
+    const saved = localStorage.getItem('catzt_cms_split_ratio');
+    return saved ? Math.min(75, Math.max(25, parseFloat(saved))) : 48;
+  });
+  const [isResizing, setIsResizing] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const draft = CMSContentStore.getDraftContent();
@@ -140,12 +149,50 @@ export const AdminCMSDashboard: React.FC = () => {
     }
   };
 
+  // Draggable Divider Handlers
+  const startResizing = useCallback(() => {
+    setIsResizing(true);
+  }, []);
+
+  const stopResizing = useCallback(() => {
+    setIsResizing(false);
+  }, []);
+
+  const resize = useCallback(
+    (e: MouseEvent) => {
+      if (isResizing && containerRef.current) {
+        const containerRect = containerRef.current.getBoundingClientRect();
+        const mouseX = e.clientX - containerRect.left;
+        const newRatio = (mouseX / containerRect.width) * 100;
+        if (newRatio >= 20 && newRatio <= 80) {
+          setSplitRatio(newRatio);
+          localStorage.setItem('catzt_cms_split_ratio', newRatio.toString());
+        }
+      }
+    },
+    [isResizing]
+  );
+
+  useEffect(() => {
+    if (isResizing) {
+      window.addEventListener('mousemove', resize);
+      window.addEventListener('mouseup', stopResizing);
+    } else {
+      window.removeEventListener('mousemove', resize);
+      window.removeEventListener('mouseup', stopResizing);
+    }
+    return () => {
+      window.removeEventListener('mousemove', resize);
+      window.removeEventListener('mouseup', stopResizing);
+    };
+  }, [isResizing, resize, stopResizing]);
+
   if (!isAuthenticated) {
     return <AdminAuthModal onSuccess={() => setIsAuthenticated(true)} />;
   }
 
   return (
-    <div className="min-h-screen bg-[#111111] text-gray-100 flex flex-col font-sans h-screen overflow-hidden">
+    <div className="min-h-screen bg-[#0a0a0c] text-zinc-100 flex flex-col font-sans h-screen overflow-hidden">
       {/* Top Header */}
       <AdminHeader
         lastPublished={lastPublished}
@@ -158,7 +205,7 @@ export const AdminCMSDashboard: React.FC = () => {
       />
 
       {/* Main App Body */}
-      <div className="flex flex-1 overflow-hidden">
+      <div ref={containerRef} className="flex flex-1 overflow-hidden relative">
         {/* Left Sidebar */}
         {viewMode !== 'preview' && (
           <AdminSidebar
@@ -173,10 +220,11 @@ export const AdminCMSDashboard: React.FC = () => {
         {/* Center Editor Panel */}
         {viewMode !== 'preview' && (
           <main
-            className={`overflow-y-auto p-6 md:p-8 bg-[#141414] ${
-              viewMode === 'split'
-                ? 'w-1/2 flex-none max-w-2xl border-r border-gray-800'
-                : 'flex-1 max-w-4xl mx-auto'
+            style={{
+              width: viewMode === 'split' ? `${splitRatio}%` : '100%',
+            }}
+            className={`overflow-y-auto p-6 md:p-8 bg-[#0e0e11] shrink-0 transition-[width] duration-75 ${
+              viewMode === 'split' ? '' : 'flex-1 max-w-5xl mx-auto'
             }`}
           >
             {activeTab === 'builder' && (
@@ -260,6 +308,19 @@ export const AdminCMSDashboard: React.FC = () => {
 
             {activeTab === 'media' && <MediaLibraryView />}
           </main>
+        )}
+
+        {/* DRAGGABLE RESIZER DIVIDER */}
+        {viewMode === 'split' && (
+          <div
+            onMouseDown={startResizing}
+            className={`w-2 hover:w-2.5 bg-[#17171b] hover:bg-amber-400 cursor-col-resize select-none flex items-center justify-center transition-colors z-20 shrink-0 border-l border-r border-zinc-800 ${
+              isResizing ? 'bg-amber-400 w-2.5 shadow-lg shadow-amber-400/40' : ''
+            }`}
+            title="Drag left or right to resize editor & live preview"
+          >
+            <div className="w-1 h-8 rounded-full bg-zinc-600 hover:bg-black transition" />
+          </div>
         )}
 
         {/* Right Live Split Preview */}

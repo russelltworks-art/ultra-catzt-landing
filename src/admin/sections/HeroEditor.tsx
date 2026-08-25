@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CMSContentSchema, PageSEOMetadata } from '../cmsContentStore';
+import { CMSContentSchema, PageSEOMetadata } from '../admin/cmsContentStore';
 import { PageSEOCard } from '../components/PageSEOCard';
 import { VisualImageSlot } from '../components/VisualImageSlot';
 import { MediaPickerModal } from '../components/MediaPickerModal';
@@ -13,6 +13,7 @@ import {
   FolderOpen,
   Upload,
   RotateCcw,
+  Film,
 } from 'lucide-react';
 
 interface HeroEditorProps {
@@ -49,14 +50,20 @@ export const HeroEditor: React.FC<HeroEditorProps> = ({
     '/wp-content/themes/omnicom/assets/images/picture-full/image14.jpg',
     '/wp-content/themes/omnicom/assets/images/picture-full/image15.jpg',
     '/wp-content/themes/omnicom/assets/images/picture-full/image16.jpg',
+    '/wp-content/themes/omnicom/assets/images/picture-full/image17.jpg',
+    '/wp-content/themes/omnicom/assets/images/picture-full/image18.jpg',
+    '/wp-content/themes/omnicom/assets/images/picture-full/image19.jpg',
+    '/wp-content/themes/omnicom/assets/images/picture-full/image20.jpg',
+    '/wp-content/themes/omnicom/assets/images/picture-full/image21.jpg',
   ];
 
   const slideImages =
-    hero.kineticSlideImages && hero.kineticSlideImages.length > 0
+    hero.kineticSlideImages && hero.kineticSlideImages.length === 13
       ? hero.kineticSlideImages
       : defaultSlideImages;
 
   const [activeMediaPickerIdx, setActiveMediaPickerIdx] = useState<number | null>(null);
+  const [phaseFilter, setPhaseFilter] = useState<'all' | 'phase1' | 'phase2'>('all');
 
   const handleUpdateSlide = (index: number, newUrl: string) => {
     const updated = [...slideImages];
@@ -65,10 +72,27 @@ export const HeroEditor: React.FC<HeroEditorProps> = ({
   };
 
   const handleResetSlides = () => {
-    if (window.confirm('Reset all 3D floating cards to default photography assets?')) {
+    if (
+      window.confirm(
+        'Reset all 13 3D floating kinetic cards (Phase 1 DNA + Phase 2 Graft) to default photography assets?'
+      )
+    ) {
       onChange('kineticSlideImages', defaultSlideImages);
     }
   };
+
+  const filteredCards = slideImages
+    .map((imgUrl, idx) => ({
+      imgUrl,
+      idx,
+      phase: idx < 8 ? 'Phase 1: Spiral DNA Helix' : 'Phase 2: Graft Expansion Climax',
+      phaseId: idx < 8 ? 'phase1' : 'phase2',
+    }))
+    .filter((item) => {
+      if (phaseFilter === 'phase1') return item.phaseId === 'phase1';
+      if (phaseFilter === 'phase2') return item.phaseId === 'phase2';
+      return true;
+    });
 
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
@@ -88,45 +112,87 @@ export const HeroEditor: React.FC<HeroEditorProps> = ({
         sectionTitle="Homepage & 3D Hero Portal"
       />
 
-      {/* 2. 3D FLOATING KINETIC CARDS (REPLACEABLE 3D TEXTURES) */}
+      {/* 2. 3D FLOATING KINETIC CARDS (ALL 13 PARTICLES ACROSS FULL ANIMATION TIMELINE) */}
       <div className="bg-[#131316] border border-zinc-800/80 rounded-2xl p-6 shadow-xl space-y-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-800">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-zinc-800">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-amber-400/10 border border-amber-400/30 flex items-center justify-center text-amber-400">
-              <Layers className="w-4 h-4" />
+              <Film className="w-4 h-4" />
             </div>
             <div>
               <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                3D Floating Kinetic Cards (Texture Gallery)
+                All 13 3D Floating Kinetic Cards (Full Animation Timeline)
                 <span className="text-[10px] bg-amber-400/15 text-amber-300 font-bold px-2 py-0.5 rounded border border-amber-400/30">
-                  {slideImages.length} 3D Cards
+                  13 Total 3D Cards
                 </span>
               </h3>
               <p className="text-[11px] text-zinc-400">
-                Replace each floating 3D particle card with your own product screenshots, graphics, or brand artwork
+                Replace every floating particle card shown from the start of the 3D vortex to the final animation climax
               </p>
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={handleResetSlides}
-            className="flex items-center gap-1 text-[11px] text-zinc-400 hover:text-red-400 transition self-end sm:self-center"
-          >
-            <RotateCcw className="w-3 h-3" /> Reset 3D Cards
-          </button>
+          <div className="flex items-center gap-2 self-start md:self-auto">
+            {/* Phase Filters */}
+            <div className="flex items-center bg-[#1a1a1e] p-0.5 rounded-lg border border-zinc-800 text-[10px]">
+              <button
+                type="button"
+                onClick={() => setPhaseFilter('all')}
+                className={`px-2 py-1 rounded font-semibold transition ${
+                  phaseFilter === 'all' ? 'bg-amber-400 text-black font-bold' : 'text-zinc-400'
+                }`}
+              >
+                All 13 Cards
+              </button>
+              <button
+                type="button"
+                onClick={() => setPhaseFilter('phase1')}
+                className={`px-2 py-1 rounded font-semibold transition ${
+                  phaseFilter === 'phase1' ? 'bg-amber-400 text-black font-bold' : 'text-zinc-400'
+                }`}
+              >
+                Phase 1 (1–8)
+              </button>
+              <button
+                type="button"
+                onClick={() => setPhaseFilter('phase2')}
+                className={`px-2 py-1 rounded font-semibold transition ${
+                  phaseFilter === 'phase2' ? 'bg-amber-400 text-black font-bold' : 'text-zinc-400'
+                }`}
+              >
+                Phase 2 Climax (9–13)
+              </button>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleResetSlides}
+              className="flex items-center gap-1 text-[11px] text-zinc-400 hover:text-red-400 transition"
+              title="Reset all 13 cards to defaults"
+            >
+              <RotateCcw className="w-3 h-3" /> Reset
+            </button>
+          </div>
         </div>
 
-        {/* 3D Cards Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {slideImages.map((imgUrl, idx) => (
+        {/* 3D Cards Grid (All 13 Cards) */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5">
+          {filteredCards.map(({ imgUrl, idx, phase }) => (
             <div
               key={idx}
               className="bg-[#18181c] p-3 rounded-2xl border border-zinc-800 hover:border-amber-400/60 transition group space-y-2 flex flex-col justify-between"
             >
               <div className="flex items-center justify-between text-[10px] text-zinc-400 font-mono">
                 <span className="font-bold text-amber-400">Card #{idx + 1}</span>
-                <span className="truncate max-w-[80px]">{imgUrl.split('/').pop()}</span>
+                <span
+                  className={`text-[9px] px-1.5 py-0.2 rounded font-semibold ${
+                    idx < 8
+                      ? 'bg-blue-950/60 text-blue-300 border border-blue-800/40'
+                      : 'bg-purple-950/60 text-purple-300 border border-purple-800/40'
+                  }`}
+                >
+                  {idx < 8 ? 'DNA Helix' : 'Graft Climax'}
+                </span>
               </div>
 
               {/* Card Image Preview */}
@@ -156,7 +222,7 @@ export const HeroEditor: React.FC<HeroEditorProps> = ({
                 onClick={() => setActiveMediaPickerIdx(idx)}
                 className="w-full flex items-center justify-center gap-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-[11px] py-1.5 rounded-lg font-semibold transition"
               >
-                <FolderOpen className="w-3 h-3 text-amber-400" /> Replace Card
+                <FolderOpen className="w-3 h-3 text-amber-400" /> Replace Card #{idx + 1}
               </button>
             </div>
           ))}
@@ -301,7 +367,9 @@ export const HeroEditor: React.FC<HeroEditorProps> = ({
             handleUpdateSlide(activeMediaPickerIdx, url);
             setActiveMediaPickerIdx(null);
           }}
-          title={`Select Custom Image for 3D Floating Card #${activeMediaPickerIdx + 1}`}
+          title={`Select Custom Image for 3D Floating Card #${activeMediaPickerIdx + 1} (${
+            activeMediaPickerIdx < 8 ? 'Phase 1: DNA Helix' : 'Phase 2: Graft Climax'
+          })`}
         />
       )}
     </div>

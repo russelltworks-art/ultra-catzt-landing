@@ -405,6 +405,11 @@ export const DEFAULT_CMS_CONTENT: CMSContentSchema = {
       '/wp-content/themes/omnicom/assets/images/picture-full/image14.jpg',
       '/wp-content/themes/omnicom/assets/images/picture-full/image15.jpg',
       '/wp-content/themes/omnicom/assets/images/picture-full/image16.jpg',
+      '/wp-content/themes/omnicom/assets/images/picture-full/image17.jpg',
+      '/wp-content/themes/omnicom/assets/images/picture-full/image18.jpg',
+      '/wp-content/themes/omnicom/assets/images/picture-full/image19.jpg',
+      '/wp-content/themes/omnicom/assets/images/picture-full/image20.jpg',
+      '/wp-content/themes/omnicom/assets/images/picture-full/image21.jpg',
     ],
   },
   aPropos: {

@@ -32,6 +32,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   onReset,
 }) => {
   const pageNav = [
+    { id: 'builder', label: '🎨 Visual Page Builder', badge: 'Wix Canvas', icon: Sparkles },
     { id: 'hero', label: 'Homepage & Hero', badge: '3D Portal', icon: Home },
     { id: 'aPropos', label: 'A Propos', badge: 'Stats', icon: Info },
     { id: 'expertises', label: '8 Expertises', badge: '8 Grid', icon: Layers },

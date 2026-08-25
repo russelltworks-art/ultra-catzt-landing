@@ -20,6 +20,7 @@ import { ContactEditor } from './sections/ContactEditor';
 import { GlobalSettingsEditor } from './sections/GlobalSettingsEditor';
 import { MediaLibraryView } from './sections/MediaLibraryView';
 import { SocialIntegrationsEditor } from './sections/SocialIntegrationsEditor';
+import { VisualSectionBuilder } from './components/VisualSectionBuilder';
 
 export const AdminCMSDashboard: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() =>
@@ -178,6 +179,14 @@ export const AdminCMSDashboard: React.FC = () => {
                 : 'flex-1 max-w-4xl mx-auto'
             }`}
           >
+            {activeTab === 'builder' && (
+              <VisualSectionBuilder
+                formData={formData}
+                onChange={setFormData}
+                onNavigateTab={(tab) => setActiveTab(tab)}
+              />
+            )}
+
             {activeTab === 'hero' && (
               <HeroEditor
                 formData={formData}

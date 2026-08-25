@@ -82,72 +82,36 @@ header button.burger-menu svg {
     height: 29px !important;
     width: 80px !important;
     display: block !important;
-/* Catzt Brand Lockup (Header & Footer) */
+}
+/* Catzt logo positioning & vertical centering */
 header .main-home-link {
     align-self: center !important;
-    display: inline-flex !important;
-    align-items: center !important;
 }
-.catzt-brand-lockup {
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 10px !important;
-    text-decoration: none !important;
-    vertical-align: middle !important;
-}
-.catzt-brand-lockup .catzt-brand-icon {
-    display: block !important;
-    height: 28px !important;
-    width: auto !important;
-    max-width: none !important;
-    object-fit: contain !important;
+header .main-home-link figure img {
+    display: block;
+    height: 32px;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
     filter: brightness(0);
-    transition: transform 0.2s ease;
 }
-.catzt-brand-lockup .catzt-brand-text {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
-    font-size: 22px !important;
-    font-weight: 700 !important;
-    letter-spacing: -0.03em !important;
-    line-height: 1 !important;
-    color: #111111 !important;
-}
-header.has-contrast-background-color .catzt-brand-lockup .catzt-brand-icon,
-header.has-surface-background-color .catzt-brand-lockup .catzt-brand-icon {
+header.has-contrast-background-color .main-home-link figure img,
+header.has-surface-background-color .main-home-link figure img {
     filter: brightness(0) invert(1) !important;
 }
-header.has-contrast-background-color .catzt-brand-lockup .catzt-brand-text,
-header.has-surface-background-color .catzt-brand-lockup .catzt-brand-text {
-    color: #ffffff !important;
-}
-
-/* Footer Brand Lockup (Sedang / Medium size) */
-.catzt-footer-brand {
+/* Footer Signature: Small, centered text "Catzt" */
+footer.wp-block-template-part figure.wp-block-image {
+    text-align: center !important;
     margin-top: 36px !important;
     margin-bottom: 20px !important;
-    display: flex !important;
-    align-items: center !important;
 }
-.catzt-brand-lockup.is-footer {
-    gap: 12px !important;
+footer.wp-block-template-part figure.wp-block-image img {
+    max-width: 320px !important;
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 auto !important;
+    display: block !important;
 }
-.catzt-brand-lockup.is-footer .catzt-brand-icon {
-    height: 38px !important;
-    filter: brightness(0) !important;
-}
-.catzt-brand-lockup.is-footer .catzt-brand-text {
-    font-size: 28px !important;
-    font-weight: 800 !important;
-    letter-spacing: -0.04em !important;
-    color: #111111 !important;
-}
-.has-contrast-background-color footer .catzt-brand-lockup.is-footer .catzt-brand-icon {
-    filter: brightness(0) invert(1) !important;
-}
-.has-contrast-background-color footer .catzt-brand-lockup.is-footer .catzt-brand-text {
-    color: #ffffff !important;
-}
-
 /* Ensure dark contrast background text stays white in idle state */
 .wp-block-omnicom-portal,
 .wp-block-omnicom-portal h2,
@@ -161,11 +125,10 @@ header.has-surface-background-color .catzt-brand-lockup .catzt-brand-text {
 
 <a class="skip-link screen-reader-text" id="wp-skip-link" href="#wp--skip-link--target">Aller au contenu</a><div class="wp-site-blocks">
 <header class="wp-block-template-part"><div class="header-helper">
-	<a class="main-home-link wp-block-omnicom-site-header" href="/" aria-label="Catzt Logo link">
-		<div class="catzt-brand-lockup">
-			<img src="/images/Catzt-logo.png" alt="Catzt" class="catzt-brand-icon">
-			<span class="catzt-brand-text">Catzt</span>
-		</div>
+	<a class="main-home-link wp-block-omnicom-site-header" href="/" aria-label="Catzt Office Logo link">
+		<figure class="wp-block-image size-full">
+			<img src="/images/Catzt-logo.png" alt="Catzt Office">
+		</figure>
 	</a>
 	<button class="burger-menu" aria-label="Menu">
 		<svg width="80" height="29" viewBox="0 0 80 29" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Menu">
@@ -485,7 +448,9 @@ header.has-surface-background-color .catzt-brand-lockup .catzt-brand-text {
 		Tel : +62 858 7711 1559	</p>
 </div>
 <ul class="nav-links has-xx-small-font-size"><li><a href="/a-propos/"><span class="caption">Kami &amp; Komunitas</span></a></li><li><a href="/expertises/"><span class="caption">Solution</span></a></li><li><a href="/references/"><span class="caption">Merch</span></a></li><li><a href="/contact/"><span class="caption">Hubungi kami</span></a></li><li><a href="/actualites/"><span class="caption">Artikel</span></a></li><li><a href="/mentions-legales/"><span class="caption">Kebijakan Privasi &amp; Legal</span></a></li><li><a href="/nous-rejoindre/"><span class="caption">Karir dan Pengembang</span></a></li></ul>
-<div class="catzt-footer-brand"><a href="/" class="catzt-brand-lockup is-footer" aria-label="Catzt"><img src="/images/Catzt-logo.png" alt="Catzt" class="catzt-brand-icon"><span class="catzt-brand-text">Catzt</span></a></div>
+<figure class="wp-block-image size-full">
+	<img decoding="async" src="/wp-content/themes/omnicom/assets/images/Logo_signature.svg" alt="Catzt OS"/>
+</figure>
 </footer>
 	</div>
 </main>

@@ -21,22 +21,28 @@ import { GlobalSettingsEditor } from './sections/GlobalSettingsEditor';
 import { MediaLibraryView } from './sections/MediaLibraryView';
 import { SocialIntegrationsEditor } from './sections/SocialIntegrationsEditor';
 import { VisualSectionBuilder } from './components/VisualSectionBuilder';
-import { GripVertical } from 'lucide-react';
+import { GripVertical, Minimize2 } from 'lucide-react';
 
 export const AdminCMSDashboard: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() =>
     CMSContentStore.isAuthenticated()
   );
-  const [activeTab, setActiveTab] = useState<string>('hero');
+  const [activeTab, setActiveTab] = useState<string>('builder');
   const [formData, setFormData] = useState<CMSContentSchema>(DEFAULT_CMS_CONTENT);
   const [saveStatus, setSaveStatus] = useState<string>('');
   const [lastPublished, setLastPublished] = useState<string>('');
   const [viewMode, setViewMode] = useState<'editor' | 'split' | 'preview'>('split');
 
-  // Draggable Split Pane Width (persisted in localStorage)
+  // Figma-Style Expansive Workspace States
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
+    return localStorage.getItem('catzt_cms_sidebar_collapsed') === 'true';
+  });
+  const [isZenMode, setIsZenMode] = useState<boolean>(false);
+
+  // Draggable Split Pane Width (15% to 85%)
   const [splitRatio, setSplitRatio] = useState<number>(() => {
     const saved = localStorage.getItem('catzt_cms_split_ratio');
-    return saved ? Math.min(75, Math.max(25, parseFloat(saved))) : 48;
+    return saved ? Math.min(85, Math.max(15, parseFloat(saved))) : 46;
   });
   const [isResizing, setIsResizing] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -46,6 +52,14 @@ export const AdminCMSDashboard: React.FC = () => {
     setFormData(draft);
     setLastPublished(draft.meta?.lastPublished || '');
   }, []);
+
+  const handleToggleSidebar = () => {
+    setIsSidebarCollapsed((prev) => {
+      const next = !prev;
+      localStorage.setItem('catzt_cms_sidebar_collapsed', next.toString());
+      return next;
+    });
+  };
 
   const handleFieldChange = (section: keyof CMSContentSchema, field: string, value: any) => {
     setFormData((prev) => {
@@ -164,7 +178,7 @@ export const AdminCMSDashboard: React.FC = () => {
         const containerRect = containerRef.current.getBoundingClientRect();
         const mouseX = e.clientX - containerRect.left;
         const newRatio = (mouseX / containerRect.width) * 100;
-        if (newRatio >= 20 && newRatio <= 80) {
+        if (newRatio >= 15 && newRatio <= 85) {
           setSplitRatio(newRatio);
           localStorage.setItem('catzt_cms_split_ratio', newRatio.toString());
         }
@@ -187,44 +201,67 @@ export const AdminCMSDashboard: React.FC = () => {
     };
   }, [isResizing, resize, stopResizing]);
 
+  // Keyboard shortcuts (Ctrl+\ for sidebar, Escape for Zen mode)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === '\\') {
+        e.preventDefault();
+        handleToggleSidebar();
+      }
+      if (e.key === 'Escape' && isZenMode) {
+        setIsZenMode(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isZenMode]);
+
   if (!isAuthenticated) {
     return <AdminAuthModal onSuccess={() => setIsAuthenticated(true)} />;
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0c] text-zinc-100 flex flex-col font-sans h-screen overflow-hidden">
-      {/* Top Header */}
-      <AdminHeader
-        lastPublished={lastPublished}
-        saveStatus={saveStatus}
-        viewMode={viewMode}
-        onViewModeChange={setViewMode}
-        onSaveDraft={handleSaveDraft}
-        onPublish={handlePublish}
-        onLogout={handleLogout}
-      />
+    <div className="min-h-screen bg-[#09090b] text-zinc-100 flex flex-col font-sans h-screen overflow-hidden">
+      {/* Top Header (Hidden in Zen Mode) */}
+      {!isZenMode && (
+        <AdminHeader
+          lastPublished={lastPublished}
+          saveStatus={saveStatus}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          onSaveDraft={handleSaveDraft}
+          onPublish={handlePublish}
+          onLogout={handleLogout}
+          isZenMode={isZenMode}
+          onToggleZenMode={() => setIsZenMode(true)}
+          isSidebarCollapsed={isSidebarCollapsed}
+          onToggleSidebar={handleToggleSidebar}
+        />
+      )}
 
-      {/* Main App Body */}
+      {/* Main Expansive Workspace */}
       <div ref={containerRef} className="flex flex-1 overflow-hidden relative">
-        {/* Left Sidebar */}
-        {viewMode !== 'preview' && (
+        {/* Left Sidebar (Hidden in Zen Mode or Preview Mode) */}
+        {!isZenMode && viewMode !== 'preview' && (
           <AdminSidebar
             activeTab={activeTab}
             onSelectTab={setActiveTab}
             onExport={handleExport}
             onImport={handleImport}
             onReset={handleReset}
+            isCollapsed={isSidebarCollapsed}
+            onToggleCollapse={handleToggleSidebar}
           />
         )}
 
-        {/* Center Editor Panel */}
-        {viewMode !== 'preview' && (
+        {/* Center Editor Panel (Expansive, Fluid Resizable Width) */}
+        {viewMode !== 'preview' && !isZenMode && (
           <main
             style={{
               width: viewMode === 'split' ? `${splitRatio}%` : '100%',
             }}
-            className={`overflow-y-auto p-6 md:p-8 bg-[#0e0e11] shrink-0 transition-[width] duration-75 ${
-              viewMode === 'split' ? '' : 'flex-1 max-w-5xl mx-auto'
+            className={`overflow-y-auto p-4 sm:p-6 md:p-8 bg-[#0d0d10] shrink-0 transition-[width] duration-75 ${
+              viewMode === 'split' ? '' : 'flex-1 max-w-6xl mx-auto'
             }`}
           >
             {activeTab === 'builder' && (
@@ -311,21 +348,39 @@ export const AdminCMSDashboard: React.FC = () => {
         )}
 
         {/* DRAGGABLE RESIZER DIVIDER */}
-        {viewMode === 'split' && (
+        {!isZenMode && viewMode === 'split' && (
           <div
             onMouseDown={startResizing}
-            className={`w-2 hover:w-2.5 bg-[#17171b] hover:bg-amber-400 cursor-col-resize select-none flex items-center justify-center transition-colors z-20 shrink-0 border-l border-r border-zinc-800 ${
-              isResizing ? 'bg-amber-400 w-2.5 shadow-lg shadow-amber-400/40' : ''
+            className={`w-2 hover:w-2.5 bg-[#141418] hover:bg-amber-400 cursor-col-resize select-none flex items-center justify-center transition-colors z-20 shrink-0 border-l border-r border-zinc-800 ${
+              isResizing ? 'bg-amber-400 w-2.5 shadow-xl shadow-amber-400/50' : ''
             }`}
-            title="Drag left or right to resize editor & live preview"
+            title="Drag left or right (15% - 85%) to resize editor & live canvas"
           >
-            <div className="w-1 h-8 rounded-full bg-zinc-600 hover:bg-black transition" />
+            <div className="w-0.5 h-8 rounded-full bg-zinc-600 hover:bg-black transition" />
           </div>
         )}
 
-        {/* Right Live Split Preview */}
-        {viewMode !== 'editor' && (
-          <LiveSplitPreview formData={formData} currentTab={activeTab} />
+        {/* Right Live Split Preview / Full Canvas */}
+        {(viewMode !== 'editor' || isZenMode) && (
+          <div className="flex-1 flex flex-col h-full overflow-hidden relative">
+            {/* Zen Mode Floating Exit Button */}
+            {isZenMode && (
+              <div className="absolute top-4 right-4 z-50 flex items-center gap-2 bg-[#121215]/90 backdrop-blur-md p-2 rounded-2xl border border-zinc-800 shadow-2xl">
+                <span className="text-[11px] font-bold text-amber-300 px-2 font-mono">
+                  Figma Zen Canvas (Press Esc to Exit)
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setIsZenMode(false)}
+                  className="bg-amber-400 hover:bg-amber-300 text-black text-xs font-bold px-3 py-1.5 rounded-xl shadow transition flex items-center gap-1"
+                >
+                  <Minimize2 className="w-3.5 h-3.5" /> Exit Zen Mode
+                </button>
+              </div>
+            )}
+
+            <LiveSplitPreview formData={formData} currentTab={activeTab} />
+          </div>
         )}
       </div>
     </div>

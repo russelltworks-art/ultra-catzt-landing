@@ -9,6 +9,10 @@ import {
   Columns,
   Square,
   Eye,
+  Maximize2,
+  Minimize2,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from 'lucide-react';
 
 interface AdminHeaderProps {
@@ -19,6 +23,10 @@ interface AdminHeaderProps {
   onSaveDraft: () => void;
   onPublish: () => void;
   onLogout: () => void;
+  isZenMode: boolean;
+  onToggleZenMode: () => void;
+  isSidebarCollapsed: boolean;
+  onToggleSidebar: () => void;
 }
 
 export const AdminHeader: React.FC<AdminHeaderProps> = ({
@@ -29,105 +37,132 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
   onSaveDraft,
   onPublish,
   onLogout,
+  isZenMode,
+  onToggleZenMode,
+  isSidebarCollapsed,
+  onToggleSidebar,
 }) => {
   return (
-    <header className="bg-[#0e0e11] border-b border-zinc-800/80 px-6 py-3 flex items-center justify-between sticky top-0 z-50 shrink-0 select-none shadow-md">
-      {/* Brand & Status */}
-      <div className="flex items-center gap-3.5">
-        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400/20 to-amber-500/10 border border-amber-400/30 flex items-center justify-center text-amber-400 shadow-inner">
-          <Sparkles className="w-4 h-4" />
-        </div>
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-extrabold tracking-wide text-white uppercase">
-              Catzt CMS
-            </span>
-            <span className="text-[10px] bg-amber-400/15 text-amber-300 font-semibold px-2 py-0.5 rounded-md border border-amber-400/30">
-              Visual Studio Pro
-            </span>
+    <header className="bg-[#0e0e11] border-b border-zinc-800/80 px-4 sm:px-6 py-2.5 flex items-center justify-between sticky top-0 z-50 shrink-0 select-none shadow-md">
+      {/* Left: Brand & Sidebar Toggle */}
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={onToggleSidebar}
+          className="p-1.5 text-zinc-400 hover:text-white rounded-lg hover:bg-zinc-800 transition"
+          title={isSidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar to Mini Rail'}
+        >
+          {isSidebarCollapsed ? (
+            <PanelLeftOpen className="w-4 h-4 text-amber-400" />
+          ) : (
+            <PanelLeftClose className="w-4 h-4" />
+          )}
+        </button>
+
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-xl bg-gradient-to-br from-amber-400/20 to-amber-500/10 border border-amber-400/30 flex items-center justify-center text-amber-400 shadow-inner">
+            <Sparkles className="w-3.5 h-3.5" />
           </div>
-          <p className="text-[10px] text-zinc-400 flex items-center gap-1.5 mt-0.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            {lastPublished
-              ? `Live Synced · ${new Date(lastPublished).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-              : 'Draft Workspace Active'}
-          </p>
+          <div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs font-black tracking-wide text-white uppercase">
+                Catzt Studio
+              </span>
+              <span className="text-[9px] bg-amber-400/15 text-amber-300 font-bold px-1.5 py-0.2 rounded border border-amber-400/30">
+                PRO
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Center View Mode Switcher */}
-      <div className="hidden md:flex items-center bg-[#151518] p-1 rounded-xl border border-zinc-800 shadow-inner">
+      <div className="flex items-center bg-[#151518] p-1 rounded-xl border border-zinc-800 shadow-inner">
         <button
           type="button"
           onClick={() => onViewModeChange('editor')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+          className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition ${
             viewMode === 'editor'
               ? 'bg-zinc-800 text-white shadow-sm'
               : 'text-zinc-400 hover:text-zinc-200'
           }`}
-          title="Editor Only View"
+          title="Editor Only (Full Width)"
         >
-          <Square className="w-3.5 h-3.5" /> Editor Only
+          <Square className="w-3.5 h-3.5" /> Editor
         </button>
         <button
           type="button"
           onClick={() => onViewModeChange('split')}
-          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition ${
+          className={`flex items-center gap-1.5 px-3.5 py-1 rounded-lg text-xs font-bold transition ${
             viewMode === 'split'
               ? 'bg-amber-400 text-black shadow-md shadow-amber-400/20'
               : 'text-zinc-400 hover:text-zinc-200'
           }`}
           title="Split Screen Live Preview"
         >
-          <Columns className="w-3.5 h-3.5" /> Live Split View
+          <Columns className="w-3.5 h-3.5" /> Split Live
         </button>
         <button
           type="button"
           onClick={() => onViewModeChange('preview')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+          className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition ${
             viewMode === 'preview'
               ? 'bg-zinc-800 text-white shadow-sm'
               : 'text-zinc-400 hover:text-zinc-200'
           }`}
-          title="Full Preview View"
+          title="Full Live Canvas"
         >
           <Eye className="w-3.5 h-3.5" /> Full Canvas
         </button>
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex items-center gap-2.5">
+      {/* Right: Actions & Zen Mode */}
+      <div className="flex items-center gap-2">
         {saveStatus && (
-          <div className="flex items-center gap-1.5 text-xs text-emerald-400 bg-emerald-950/80 px-3 py-1.5 rounded-xl border border-emerald-800 animate-in fade-in">
-            <CheckCircle className="w-3.5 h-3.5" />
-            <span className="font-medium text-[11px]">{saveStatus}</span>
+          <div className="hidden sm:flex items-center gap-1.5 text-xs text-emerald-400 bg-emerald-950/80 px-2.5 py-1 rounded-lg border border-emerald-800">
+            <CheckCircle className="w-3 h-3" />
+            <span className="text-[10px] font-semibold">{saveStatus}</span>
           </div>
         )}
+
+        {/* Zen / Immersion Mode */}
+        <button
+          type="button"
+          onClick={onToggleZenMode}
+          className={`p-1.5 rounded-lg border transition ${
+            isZenMode
+              ? 'bg-amber-400 text-black border-amber-300 shadow-md shadow-amber-400/30'
+              : 'bg-[#18181c] text-zinc-400 hover:text-white border-zinc-800 hover:bg-zinc-800'
+          }`}
+          title={isZenMode ? 'Exit Zen Mode' : 'Enter Zen Fullscreen Canvas (Figma Mode)'}
+        >
+          {isZenMode ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+        </button>
 
         <button
           type="button"
           onClick={onSaveDraft}
-          className="flex items-center gap-1.5 text-xs bg-[#1a1a1e] hover:bg-zinc-800 text-zinc-200 px-3.5 py-2 rounded-xl font-semibold border border-zinc-700/80 transition shadow-sm hover:border-zinc-600"
+          className="hidden sm:flex items-center gap-1.5 text-xs bg-[#1a1a1e] hover:bg-zinc-800 text-zinc-200 px-3 py-1.5 rounded-xl font-semibold border border-zinc-700/80 transition"
         >
-          <Save className="w-3.5 h-3.5 text-zinc-400" /> Save Draft
+          <Save className="w-3.5 h-3.5 text-zinc-400" /> Save
         </button>
 
         <button
           type="button"
           onClick={onPublish}
-          className="flex items-center gap-1.5 text-xs bg-gradient-to-r from-amber-400 to-amber-300 hover:from-amber-300 hover:to-amber-200 text-black px-4 py-2 rounded-xl font-bold shadow-lg shadow-amber-400/20 transition active:scale-[0.98]"
+          className="flex items-center gap-1.5 text-xs bg-gradient-to-r from-amber-400 to-amber-300 hover:from-amber-300 hover:to-amber-200 text-black px-3.5 py-1.5 rounded-xl font-bold shadow-md shadow-amber-400/20 transition active:scale-[0.98]"
         >
-          <Send className="w-3.5 h-3.5" /> Publish Live
+          <Send className="w-3.5 h-3.5" /> Publish
         </button>
 
         <a
           href="/"
           target="_blank"
           rel="noopener noreferrer"
-          className="hidden sm:flex items-center gap-1 p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-xl transition"
+          className="hidden md:flex p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition"
           title="Open Live Website"
         >
-          <ExternalLink className="w-4 h-4" />
+          <ExternalLink className="w-3.5 h-3.5" />
         </a>
 
         <div className="h-4 w-px bg-zinc-800 mx-0.5" />
@@ -136,9 +171,9 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           type="button"
           onClick={onLogout}
           title="Logout"
-          className="p-2 text-zinc-400 hover:text-red-400 hover:bg-red-950/30 rounded-xl transition"
+          className="p-1.5 text-zinc-400 hover:text-red-400 hover:bg-red-950/30 rounded-lg transition"
         >
-          <LogOut className="w-4 h-4" />
+          <LogOut className="w-3.5 h-3.5" />
         </button>
       </div>
     </header>

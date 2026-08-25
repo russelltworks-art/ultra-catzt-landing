@@ -6,24 +6,28 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <title>Catzt Kinetic CMS — Admin Dashboard</title>
+  <title>Catzt Visual Studio CMS — Admin Dashboard</title>
   <link rel="icon" type="image/x-icon" href="/wp-content/themes/omnicom/favicon.ico" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    // Automatic Cache Invalidation & Stale Bundle Recovery
+    // Force complete cache invalidation & service worker purge
     (function () {
-      const CURRENT_APP_VERSION = 'catzt_cms_v_2026_08_26_0135';
-      const storedVersion = localStorage.getItem('catzt_app_build_version');
-      if (storedVersion !== CURRENT_APP_VERSION) {
-        localStorage.setItem('catzt_app_build_version', CURRENT_APP_VERSION);
-        if ('caches' in window) {
-          caches.keys().then(function (names) {
-            for (let name of names) caches.delete(name);
-          });
-        }
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function (registrations) {
+          for (var i = 0; i < registrations.length; i++) {
+            registrations[i].unregister();
+          }
+        });
+      }
+      if ('caches' in window) {
+        caches.keys().then(function (names) {
+          for (var i = 0; i < names.length; i++) {
+            caches.delete(names[i]);
+          }
+        });
       }
       window.addEventListener('vite:preloadError', function () {
         window.location.reload(true);
@@ -34,11 +38,11 @@
     body {
       margin: 0;
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background-color: #111111;
-      color: #ffffff;
+      background-color: #0a0a0c;
+      color: #f4f4f5;
     }
   </style>
-  <script type="module" crossorigin src="/assets/catzt-admin-v2-CXWrx5zA.js"></script>
+  <script type="module" crossorigin src="/assets/catzt-admin-v2-DAnlMbxv.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/catzt-cmsContentStore-v2-DUNpuJ1h.js">
   <link rel="stylesheet" crossorigin href="/assets/catzt-admin-v2-WCg1Ty1f.css">
 </head>

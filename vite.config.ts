@@ -1,21 +1,39 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-
 import { resolve } from 'path';
 
+// https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  root: resolve(__dirname),
+  envDir: resolve(__dirname, '../..'),
   appType: 'mpa',
+  plugins: [react()],
+  define: {
+    __APP_BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+  },
+  resolve: {
+    alias: {
+      'react-native': resolve(__dirname, 'src/lib/reactNativeMock.tsx'),
+    },
+    extensions: ['.tsx', '.ts', '.jsx', '.js'],
+  },
   server: {
     port: 7700,
+    strictPort: true,
+    fs: {
+      allow: [resolve(__dirname, '../..')],
+    },
     headers: {
       'Cache-Control': 'no-store, no-cache, must-revalidate',
       'Pragma': 'no-cache',
       'Expires': '0',
     },
+    watch: {
+      ignored: [],
+    },
   },
   build: {
-    outDir: 'dist',
+    outDir: resolve(__dirname, 'dist'),
     emptyOutDir: true,
     rollupOptions: {
       input: {
@@ -36,6 +54,11 @@ export default defineConfig({
         expCrise: resolve(__dirname, 'expertises/crise/index.html'),
         expDigital: resolve(__dirname, 'expertises/digital-social-media/index.html'),
         expIntel: resolve(__dirname, 'expertises/intelligence-strategique/index.html'),
+      },
+      output: {
+        entryFileNames: 'assets/[name]-[hash].js',
+        chunkFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]',
       },
     },
   },

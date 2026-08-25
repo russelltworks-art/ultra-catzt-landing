@@ -1,6 +1,6 @@
 /**
  * Catzt CMS Content Store & Schema
- * Manages full live state, drafts, publish pipeline, media asset library, and admin auth session
+ * Manages full live state, drafts, publish pipeline, media asset library, SEO metadata, articles, and admin auth
  */
 
 export interface MediaAsset {
@@ -11,6 +11,28 @@ export interface MediaAsset {
   size?: string;
   uploadedAt: string;
   isCustom?: boolean;
+}
+
+export interface PageSEOMetadata {
+  pageName: string;
+  metaTitle: string;
+  metaDescription: string;
+  slug: string;
+  ogImage: string;
+}
+
+export interface ArticleItem {
+  id: string;
+  title: string;
+  slug: string;
+  category: string;
+  imageUrl: string;
+  linkUrl: string;
+  date: string;
+  author?: string;
+  excerpt?: string;
+  content?: string;
+  status: 'published' | 'draft';
 }
 
 export interface CMSContentSchema {
@@ -28,6 +50,15 @@ export interface CMSContentSchema {
     cookieBannerText: string;
     adminPassword?: string;
   };
+  pagesSEO: {
+    hero: PageSEOMetadata;
+    aPropos: PageSEOMetadata;
+    expertises: PageSEOMetadata;
+    references: PageSEOMetadata;
+    actualites: PageSEOMetadata;
+    nousRejoindre: PageSEOMetadata;
+    contact: PageSEOMetadata;
+  };
   hero: {
     subtitle: string;
     headline: string;
@@ -35,12 +66,14 @@ export interface CMSContentSchema {
     ctaPrimaryLink: string;
     ctaSecondaryText: string;
     ctaSecondaryLink: string;
-    backgroundMediaUrl?: string;
+    backgroundMediaUrl: string;
+    brandWatermarkUrl?: string;
   };
   aPropos: {
     title: string;
     headline: string;
     introParagraph: string;
+    featuredImageUrl?: string;
     stats: Array<{ id: string; value: string; label: string }>;
     certifications: Array<{ id: string; title: string; image: string; tag: string }>;
   };
@@ -61,19 +94,13 @@ export interface CMSContentSchema {
   };
   actualites: {
     mainTitle: string;
-    items: Array<{
-      id: string;
-      title: string;
-      category: string;
-      imageUrl: string;
-      linkUrl: string;
-      date?: string;
-    }>;
+    items: ArticleItem[];
   };
   nousRejoindre: {
     headline: string;
     subheadline: string;
     teamSize: string;
+    bannerImageUrl?: string;
   };
   contact: {
     headline: string;
@@ -225,17 +252,68 @@ export const STOCK_MEDIA_ASSETS: MediaAsset[] = [
 export const DEFAULT_CMS_CONTENT: CMSContentSchema = {
   meta: {
     lastPublished: new Date().toISOString(),
-    version: '1.0.0',
+    version: '1.2.0',
     publishedBy: 'Catzt Admin',
   },
   global: {
-    siteTitle: 'Catzt OS',
-    brandName: 'Catzt OS',
+    siteTitle: 'Catzt Office — Systemic Control for Multi-Marketplace Operations',
+    brandName: 'Catzt Office',
     contactEmail: 'contact@catztoffice.com',
     contactPhone: '+33 (0)1 53 32 60 00',
     officeAddress: '73-75 rue la Condamine, 75017 Paris',
     cookieBannerText: 'Nous utilisons des cookies pour améliorer votre expérience, analyser le trafic et personnaliser le contenu.',
     adminPassword: 'catzt2026',
+  },
+  pagesSEO: {
+    hero: {
+      pageName: 'Homepage & Hero 3D',
+      metaTitle: 'Catzt Office — Systemic Control for Multi-Marketplace Operations',
+      metaDescription: 'Catzt Office is the growth infrastructure and systemic control agency for online sellers and brand leaders.',
+      slug: '/',
+      ogImage: '/images/Catzt-logo.png',
+    },
+    aPropos: {
+      pageName: 'A Propos',
+      metaTitle: 'A Propos — Catzt Office',
+      metaDescription: 'Nous sommes une agence conseil en réputation, influence et accélération de croissance e-commerce.',
+      slug: '/a-propos/',
+      ogImage: '/wp-content/uploads/2026/01/Label-RSE.png',
+    },
+    expertises: {
+      pageName: '8 Expertises',
+      metaTitle: '8 Expertises Stratégiques — Catzt Office',
+      metaDescription: 'Catzt Office mobilise 8 expertises clefs au service de votre réputation et performance.',
+      slug: '/expertises/',
+      ogImage: '/wp-content/uploads/2025/07/image6.jpg',
+    },
+    references: {
+      pageName: 'Références & Clients',
+      metaTitle: 'Références & Clients — Catzt Office',
+      metaDescription: 'Découvrez plus de 90 clients français et internationaux qui font confiance à Catzt Office.',
+      slug: '/references/',
+      ogImage: '/wp-content/uploads/2025/11/Intel-omnicom-logo-client.svg',
+    },
+    actualites: {
+      pageName: 'Actualités (Articles & Blog)',
+      metaTitle: 'Actualités & Publications — Catzt Office',
+      metaDescription: 'Découvrez nos dernières annonces, études de cas, articles et réalisations.',
+      slug: '/actualites/',
+      ogImage: '/wp-content/uploads/2026/01/51e90374-6d77-45c0-aaa7-782e982df077.png',
+    },
+    nousRejoindre: {
+      pageName: 'Nous Rejoindre (Careers)',
+      metaTitle: 'Nous Rejoindre — Catzt Office',
+      metaDescription: 'Rejoindre Catzt Office, c’est intégrer un collectif de 50 experts engagés.',
+      slug: '/nous-rejoindre/',
+      ogImage: '/images/Catzt-logo.png',
+    },
+    contact: {
+      pageName: 'Contact & Paris Offices',
+      metaTitle: 'Contact & Siège Paris — Catzt Office',
+      metaDescription: 'Vous avez une question, un projet ou un enjeu stratégique ? Contactez nos équipes à Paris.',
+      slug: '/contact/',
+      ogImage: '/images/Catzt-logo.png',
+    },
   },
   hero: {
     subtitle: 'Systemic Control',
@@ -245,11 +323,13 @@ export const DEFAULT_CMS_CONTENT: CMSContentSchema = {
     ctaSecondaryText: 'Expertises',
     ctaSecondaryLink: '/expertises/',
     backgroundMediaUrl: '/images/Catzt-logo.png',
+    brandWatermarkUrl: '/images/Catzt-logo.png',
   },
   aPropos: {
     title: 'A propos',
     headline: 'Nous sommes une agence conseil en réputation et influence.',
     introParagraph: 'La réputation est un puissant moteur de création de valeur capable de générer une croissance durable.',
+    featuredImageUrl: '/wp-content/uploads/2025/07/image6.jpg',
     stats: [
       { id: 'stat-1', value: '50+', label: 'Experts engagés' },
       { id: 'stat-2', value: '90+', label: 'Clients français et internationaux' },
@@ -262,63 +342,35 @@ export const DEFAULT_CMS_CONTENT: CMSContentSchema = {
     ],
   },
   expertises: {
-    mainTitle: 'Catzt Office mobilise 8 expertises clefs au service de votre réputation.',
+    mainTitle: 'Catzt OS menyediakan 4 ekosistem modular untuk akselerasi operasional bisnis Anda.',
     items: [
       {
         id: 'exp-1',
-        slug: 'intelligence-strategique',
-        title: 'Intelligence stratégique',
-        shortDesc: 'Veille, analyse des signaux faibles et cartographie des parties prenantes.',
+        slug: 'office-as-team-labs',
+        title: 'Office as team labs',
+        shortDesc: 'Kolaborasi tim operasional, kontrol hak akses multi-brand, dan pusat komando workspace terpadu.',
         image: '/wp-content/uploads/2025/07/image6.jpg',
       },
       {
         id: 'exp-2',
-        slug: 'corporate-engagement',
-        title: 'Corporate & Engagement',
-        shortDesc: 'Positionnement de marque employeur et engagement sociétal.',
+        slug: 'catzt-omni-messenger',
+        title: 'Catzt Omni-Messenger',
+        shortDesc: 'Unified live chat multi-marketplace (Shopee, Tokopedia, TikTok), otomatisasi CS AI, dan manajemen pesan terpusat.',
         image: '/wp-content/uploads/2025/07/image5.jpg',
       },
       {
         id: 'exp-3',
-        slug: 'crise',
-        title: 'Crise & Enjeux sensibles',
-        shortDesc: 'Préparation, simulation et gestion opérationnelle des crises de réputation.',
+        slug: 'catzt-zom-apps',
+        title: 'Catzt ZOM Apps',
+        shortDesc: 'Zero Overhead Marketplace Engine untuk sinkronisasi pesanan instan, telemetri profit riil, dan analitik performa toko.',
         image: '/wp-content/uploads/2025/07/image3.jpg',
       },
       {
         id: 'exp-4',
-        slug: 'affaires-publiques',
-        title: 'Affaires publiques',
-        shortDesc: 'Relations institutionnelles, plaidoyer et analyse réglementaire.',
-        image: '/wp-content/uploads/2025/07/image2.jpg',
-      },
-      {
-        id: 'exp-5',
-        slug: 'communication-de-marque',
-        title: 'Communication de marque',
-        shortDesc: 'Création de récits de marque mémorables et activation multicanale.',
+        slug: 'catzt-door-wms',
+        title: 'Catzt Door WMS',
+        shortDesc: 'Warehouse Management System modern dengan atomic stock sync, pemindaian barcode rak-bin, dan cetak AWB massal.',
         image: '/wp-content/uploads/2025/07/image4.jpg',
-      },
-      {
-        id: 'exp-6',
-        slug: 'digital-social-media',
-        title: 'Influence marketing & social media',
-        shortDesc: 'Stratégies social media, relations créateurs et campagnes d’influence.',
-        image: '/wp-content/uploads/2025/07/image7.jpg',
-      },
-      {
-        id: 'exp-7',
-        slug: 'coordination-internationale',
-        title: 'Coordination internationale',
-        shortDesc: 'Pilotage de campagnes paneuropéennes et déploiement mondial.',
-        image: '/wp-content/uploads/2025/07/image8.jpg',
-      },
-      {
-        id: 'exp-8',
-        slug: 'communication-financiere',
-        title: 'Communication financière',
-        shortDesc: 'Opérations de marché, fusions-acquisitions et relations investisseurs.',
-        image: '/wp-content/uploads/2025/07/image.jpg',
       },
     ],
   },
@@ -335,15 +387,33 @@ export const DEFAULT_CMS_CONTENT: CMSContentSchema = {
     ],
   },
   actualites: {
-    mainTitle: 'Découvrez nos dernières annonces et réalisations',
+    mainTitle: 'Découvrez nos dernières annonces, articles et réalisations',
     items: [
       {
         id: 'news-1',
         title: 'La réputation s’impose comme un actif stratégique des dirigeants face à l’incertitude',
-        category: 'News',
+        slug: 'reputation-actif-strategique-dirigeants-2026',
+        category: 'Publications & Insights',
         imageUrl: '/wp-content/uploads/2026/01/51e90374-6d77-45c0-aaa7-782e982df077.png',
         linkUrl: '/actualites/',
-        date: '2026',
+        date: '2026-01-20',
+        author: 'Catzt Editorial Team',
+        excerpt: 'Analyse stratégique sur la valeur intangible des marques et les nouveaux leviers de croissance multi-marketplace.',
+        content: 'Dans un contexte d’incertitude économique globale, la réputation et le contrôle systémique des canaux de vente deviennent les piliers essentiels de toute marque leader...',
+        status: 'published',
+      },
+      {
+        id: 'news-2',
+        title: 'Déploiement de la nouvelle infrastructure de contrôle systémique pour e-commerçants',
+        slug: 'deploiement-infrastructure-controle-systemique',
+        category: 'Case Study',
+        imageUrl: '/wp-content/uploads/2025/07/image6.jpg',
+        linkUrl: '/actualites/',
+        date: '2026-02-14',
+        author: 'Catzt Engineering & Growth',
+        excerpt: 'Comment les marques européennes unifient leurs opérations TikTok Shop, Shopee et e-commerce via Catzt Office.',
+        content: 'L’unification des opérations marketplace permet de réduire les frictions logistiques et d’automatiser les conversions à grande échelle...',
+        status: 'published',
       },
     ],
   },
@@ -351,6 +421,7 @@ export const DEFAULT_CMS_CONTENT: CMSContentSchema = {
     headline: 'Rejoindre Catzt Office, c’est intégrer un collectif de 50 experts engagés.',
     subheadline: 'Construisons ensemble l’avenir de la réputation de marque.',
     teamSize: '50+',
+    bannerImageUrl: '/wp-content/uploads/2025/12/omnicom-nousrejoindre-1.jpg',
   },
   contact: {
     headline: 'Vous avez une question, un projet ou un enjeu stratégique ?',
@@ -373,7 +444,11 @@ export class CMSContentStore {
       const raw = localStorage.getItem(STORAGE_KEY_PUBLISHED);
       if (raw) {
         const parsed = JSON.parse(raw);
-        return { ...DEFAULT_CMS_CONTENT, ...parsed };
+        return {
+          ...DEFAULT_CMS_CONTENT,
+          ...parsed,
+          pagesSEO: { ...DEFAULT_CMS_CONTENT.pagesSEO, ...(parsed.pagesSEO || {}) },
+        };
       }
     } catch {
       // fallback
@@ -386,7 +461,11 @@ export class CMSContentStore {
       const raw = localStorage.getItem(STORAGE_KEY_DRAFT);
       if (raw) {
         const parsed = JSON.parse(raw);
-        return { ...DEFAULT_CMS_CONTENT, ...parsed };
+        return {
+          ...DEFAULT_CMS_CONTENT,
+          ...parsed,
+          pagesSEO: { ...DEFAULT_CMS_CONTENT.pagesSEO, ...(parsed.pagesSEO || {}) },
+        };
       }
     } catch {
       // fallback

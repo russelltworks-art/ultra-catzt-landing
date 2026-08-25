@@ -126,11 +126,24 @@ export class LandingHydrator {
 
   private static updateFaviconTheme() {
     if (typeof window === 'undefined') return;
-    const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const faviconPng = document.querySelector('link[rel="icon"][type="image/png"]') as HTMLLinkElement;
-    if (faviconPng) {
-      faviconPng.href = isDark ? '/favicon-dark.png' : '/favicon-light.png';
-    }
+    const isDark = !window.matchMedia || window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    // Remove any old lingering favicon links
+    document.querySelectorAll('link[rel*="icon"]').forEach((el) => el.remove());
+
+    // Inject active SVG Favicon
+    const linkSvg = document.createElement('link');
+    linkSvg.rel = 'icon';
+    linkSvg.type = 'image/svg+xml';
+    linkSvg.href = `/favicon.svg?t=${Date.now()}`;
+    document.head.appendChild(linkSvg);
+
+    // Inject fallback PNG matching theme
+    const linkPng = document.createElement('link');
+    linkPng.rel = 'alternate icon';
+    linkPng.type = 'image/png';
+    linkPng.href = isDark ? `/favicon-dark.png?t=${Date.now()}` : `/favicon-light.png?t=${Date.now()}`;
+    document.head.appendChild(linkPng);
   }
 }
 

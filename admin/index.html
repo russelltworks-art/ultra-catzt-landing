@@ -13,10 +13,22 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    // Automatic stale cache recovery
-    window.addEventListener('vite:preloadError', function () {
-      window.location.reload();
-    });
+    // Automatic Cache Invalidation & Stale Bundle Recovery
+    (function () {
+      const CURRENT_APP_VERSION = 'catzt_cms_v_2026_08_26_0135';
+      const storedVersion = localStorage.getItem('catzt_app_build_version');
+      if (storedVersion !== CURRENT_APP_VERSION) {
+        localStorage.setItem('catzt_app_build_version', CURRENT_APP_VERSION);
+        if ('caches' in window) {
+          caches.keys().then(function (names) {
+            for (let name of names) caches.delete(name);
+          });
+        }
+      }
+      window.addEventListener('vite:preloadError', function () {
+        window.location.reload(true);
+      });
+    })();
   </script>
   <style>
     body {
@@ -26,11 +38,9 @@
       color: #ffffff;
     }
   </style>
-  <script type="module" crossorigin src="/assets/admin-CAVmiIEY.js"></script>
-  <link rel="modulepreload" crossorigin href="/assets/cmsContentStore-To86yMwF.js">
-  <link rel="stylesheet" crossorigin href="/assets/admin-BWh73ZWR.css">
 </head>
 <body>
   <div id="root"></div>
+  <script type="module" src="/src/admin/main.tsx"></script>
 </body>
 </html>

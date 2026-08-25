@@ -1,6 +1,7 @@
 /**
  * Catzt CMS Content Store & Schema
- * Manages full live state, drafts, publish pipeline, media asset library, SEO metadata, articles, and admin auth
+ * Enterprise-grade state management with Google SEO, Social Media Cards (Meta, Twitter/X, LinkedIn, TikTok),
+ * Schema.org JSON-LD, and Pixel Tracking Integrations.
  */
 
 export interface MediaAsset {
@@ -19,6 +20,12 @@ export interface PageSEOMetadata {
   metaDescription: string;
   slug: string;
   ogImage: string;
+  canonicalUrl?: string;
+  focusKeyword?: string;
+  keywords?: string;
+  twitterCardType?: 'summary_large_image' | 'summary' | 'player';
+  schemaType?: 'WebSite' | 'Article' | 'SoftwareApplication' | 'Organization';
+  tiktokVideoUrl?: string;
 }
 
 export interface ArticleItem {
@@ -33,6 +40,22 @@ export interface ArticleItem {
   excerpt?: string;
   content?: string;
   status: 'published' | 'draft';
+  canonicalUrl?: string;
+  tiktokVideoEmbedUrl?: string;
+  youtubeVideoUrl?: string;
+  instagramEmbedUrl?: string;
+}
+
+export interface TrackingIntegrations {
+  googleAnalyticsId: string;
+  googleSearchConsoleVerification: string;
+  googleTagManagerId: string;
+  metaPixelId: string;
+  metaDomainVerification: string;
+  facebookAppId: string;
+  tiktokPixelId: string;
+  sitemapEnabled: boolean;
+  robotsTxtCustom: string;
 }
 
 export interface CMSContentSchema {
@@ -50,6 +73,7 @@ export interface CMSContentSchema {
     cookieBannerText: string;
     adminPassword?: string;
   };
+  integrations: TrackingIntegrations;
   pagesSEO: {
     hero: PageSEOMetadata;
     aPropos: PageSEOMetadata;
@@ -68,6 +92,7 @@ export interface CMSContentSchema {
     ctaSecondaryLink: string;
     backgroundMediaUrl: string;
     brandWatermarkUrl?: string;
+    featuredVideoUrl?: string;
   };
   aPropos: {
     title: string;
@@ -252,17 +277,28 @@ export const STOCK_MEDIA_ASSETS: MediaAsset[] = [
 export const DEFAULT_CMS_CONTENT: CMSContentSchema = {
   meta: {
     lastPublished: new Date().toISOString(),
-    version: '1.2.0',
+    version: '1.3.0',
     publishedBy: 'Catzt Admin',
   },
   global: {
-    siteTitle: 'Catzt OS — Systemic Control for Multi-Marketplace Operations',
-    brandName: 'Catzt OS',
-    contactEmail: 'hello@catzt.com',
-    contactPhone: '+62 858 7711 1559',
-    officeAddress: 'Tangerang, Indonesia',
-    cookieBannerText: 'Kami menggunakan cookie penting untuk kenyamanan dan performa navigasi Anda.',
+    siteTitle: 'Catzt Office — Systemic Control for Multi-Marketplace Operations',
+    brandName: 'Catzt Office',
+    contactEmail: 'contact@catztoffice.com',
+    contactPhone: '+33 (0)1 53 32 60 00',
+    officeAddress: '73-75 rue la Condamine, 75017 Paris',
+    cookieBannerText: 'Nous utilisons des cookies pour améliorer votre expérience, analyser le trafic et personnaliser le contenu.',
     adminPassword: 'catzt2026',
+  },
+  integrations: {
+    googleAnalyticsId: '',
+    googleSearchConsoleVerification: '',
+    googleTagManagerId: '',
+    metaPixelId: '',
+    metaDomainVerification: '',
+    facebookAppId: '',
+    tiktokPixelId: '',
+    sitemapEnabled: true,
+    robotsTxtCustom: 'User-agent: *\nAllow: /\nSitemap: https://catzt.com/sitemap.xml',
   },
   pagesSEO: {
     hero: {
@@ -271,6 +307,12 @@ export const DEFAULT_CMS_CONTENT: CMSContentSchema = {
       metaDescription: 'Catzt Office is the growth infrastructure and systemic control agency for online sellers and brand leaders.',
       slug: '/',
       ogImage: '/images/Catzt-logo.png',
+      canonicalUrl: 'https://catzt.com/',
+      focusKeyword: 'Systemic Control',
+      keywords: 'ecommerce management, omnichannel, tiktok shop, shopee, marketplace operations',
+      twitterCardType: 'summary_large_image',
+      schemaType: 'SoftwareApplication',
+      tiktokVideoUrl: '',
     },
     aPropos: {
       pageName: 'A Propos',
@@ -278,6 +320,10 @@ export const DEFAULT_CMS_CONTENT: CMSContentSchema = {
       metaDescription: 'Nous sommes une agence conseil en réputation, influence et accélération de croissance e-commerce.',
       slug: '/a-propos/',
       ogImage: '/wp-content/uploads/2026/01/Label-RSE.png',
+      canonicalUrl: 'https://catzt.com/a-propos/',
+      focusKeyword: 'Agence conseil réputation',
+      twitterCardType: 'summary_large_image',
+      schemaType: 'Organization',
     },
     expertises: {
       pageName: '8 Expertises',
@@ -285,6 +331,10 @@ export const DEFAULT_CMS_CONTENT: CMSContentSchema = {
       metaDescription: 'Catzt Office mobilise 8 expertises clefs au service de votre réputation et performance.',
       slug: '/expertises/',
       ogImage: '/wp-content/uploads/2025/07/image6.jpg',
+      canonicalUrl: 'https://catzt.com/expertises/',
+      focusKeyword: 'Expertises réputation',
+      twitterCardType: 'summary_large_image',
+      schemaType: 'Organization',
     },
     references: {
       pageName: 'Références & Clients',
@@ -292,6 +342,10 @@ export const DEFAULT_CMS_CONTENT: CMSContentSchema = {
       metaDescription: 'Découvrez plus de 90 clients français et internationaux qui font confiance à Catzt Office.',
       slug: '/references/',
       ogImage: '/wp-content/uploads/2025/11/Intel-omnicom-logo-client.svg',
+      canonicalUrl: 'https://catzt.com/references/',
+      focusKeyword: 'Clients et partenaires',
+      twitterCardType: 'summary_large_image',
+      schemaType: 'Organization',
     },
     actualites: {
       pageName: 'Actualités (Articles & Blog)',
@@ -299,6 +353,10 @@ export const DEFAULT_CMS_CONTENT: CMSContentSchema = {
       metaDescription: 'Découvrez nos dernières annonces, études de cas, articles et réalisations.',
       slug: '/actualites/',
       ogImage: '/wp-content/uploads/2026/01/51e90374-6d77-45c0-aaa7-782e982df077.png',
+      canonicalUrl: 'https://catzt.com/actualites/',
+      focusKeyword: 'Actualités ecommerce',
+      twitterCardType: 'summary_large_image',
+      schemaType: 'Article',
     },
     nousRejoindre: {
       pageName: 'Nous Rejoindre (Careers)',
@@ -306,6 +364,10 @@ export const DEFAULT_CMS_CONTENT: CMSContentSchema = {
       metaDescription: 'Rejoindre Catzt Office, c’est intégrer un collectif de 50 experts engagés.',
       slug: '/nous-rejoindre/',
       ogImage: '/images/Catzt-logo.png',
+      canonicalUrl: 'https://catzt.com/nous-rejoindre/',
+      focusKeyword: 'Recrutement agence',
+      twitterCardType: 'summary_large_image',
+      schemaType: 'Organization',
     },
     contact: {
       pageName: 'Contact & Paris Offices',
@@ -313,6 +375,10 @@ export const DEFAULT_CMS_CONTENT: CMSContentSchema = {
       metaDescription: 'Vous avez une question, un projet ou un enjeu stratégique ? Contactez nos équipes à Paris.',
       slug: '/contact/',
       ogImage: '/images/Catzt-logo.png',
+      canonicalUrl: 'https://catzt.com/contact/',
+      focusKeyword: 'Contact agence Paris',
+      twitterCardType: 'summary_large_image',
+      schemaType: 'Organization',
     },
   },
   hero: {
@@ -324,6 +390,7 @@ export const DEFAULT_CMS_CONTENT: CMSContentSchema = {
     ctaSecondaryLink: '/expertises/',
     backgroundMediaUrl: '/images/Catzt-logo.png',
     brandWatermarkUrl: '/images/Catzt-logo.png',
+    featuredVideoUrl: '',
   },
   aPropos: {
     title: 'A propos',
@@ -342,35 +409,63 @@ export const DEFAULT_CMS_CONTENT: CMSContentSchema = {
     ],
   },
   expertises: {
-    mainTitle: 'Catzt OS menyediakan 4 ekosistem modular untuk akselerasi operasional bisnis Anda.',
+    mainTitle: 'Catzt Office mobilise 8 expertises clefs au service de votre réputation.',
     items: [
       {
         id: 'exp-1',
-        slug: 'office-as-omni-channel',
-        title: 'Office as Omni-Channel',
-        shortDesc: 'Pusat kendali integrasi multi-channel, inventori terpusat, dan sinkronisasi marketplace secara realtime.',
+        slug: 'intelligence-strategique',
+        title: 'Intelligence stratégique',
+        shortDesc: 'Veille, analyse des signaux faibles et cartographie des parties prenantes.',
         image: '/wp-content/uploads/2025/07/image6.jpg',
       },
       {
         id: 'exp-2',
-        slug: 'omni-messenger',
-        title: 'Omni-Messenger',
-        shortDesc: 'Unified live chat multi-marketplace (Shopee, Tokopedia, TikTok), otomatisasi CS AI, dan manajemen pesan terpusat.',
+        slug: 'corporate-engagement',
+        title: 'Corporate & Engagement',
+        shortDesc: 'Positionnement de marque employeur et engagement sociétal.',
         image: '/wp-content/uploads/2025/07/image5.jpg',
       },
       {
         id: 'exp-3',
-        slug: 'zom-as-team-chat',
-        title: 'ZOM as Team Chat',
-        shortDesc: 'Pusat kolaborasi tim, komunikasi operasional internal, koordinasi staf gudang, dan pembagian tugas cepat.',
+        slug: 'crise',
+        title: 'Crise & Enjeux sensibles',
+        shortDesc: 'Préparation, simulation et gestion opérationnelle des crises de réputation.',
         image: '/wp-content/uploads/2025/07/image3.jpg',
       },
       {
         id: 'exp-4',
-        slug: 'warehouse-management-system',
-        title: 'Warehouse Management System',
-        shortDesc: 'WMS modern dengan atomic stock sync, tata kelola rak-bin, picking-packing presisi, dan cetak AWB massal.',
+        slug: 'affaires-publiques',
+        title: 'Affaires publiques',
+        shortDesc: 'Relations institutionnelles, plaidoyer et analyse réglementaire.',
+        image: '/wp-content/uploads/2025/07/image2.jpg',
+      },
+      {
+        id: 'exp-5',
+        slug: 'communication-de-marque',
+        title: 'Communication de marque',
+        shortDesc: 'Création de récits de marque mémorables et activation multicanale.',
         image: '/wp-content/uploads/2025/07/image4.jpg',
+      },
+      {
+        id: 'exp-6',
+        slug: 'digital-social-media',
+        title: 'Influence marketing & social media',
+        shortDesc: 'Stratégies social media, relations créateurs et campagnes d’influence.',
+        image: '/wp-content/uploads/2025/07/image7.jpg',
+      },
+      {
+        id: 'exp-7',
+        slug: 'coordination-internationale',
+        title: 'Coordination internationale',
+        shortDesc: 'Pilotage de campagnes paneuropéennes et déploiement mondial.',
+        image: '/wp-content/uploads/2025/07/image8.jpg',
+      },
+      {
+        id: 'exp-8',
+        slug: 'communication-financiere',
+        title: 'Communication financière',
+        shortDesc: 'Opérations de marché, fusions-acquisitions et relations investisseurs.',
+        image: '/wp-content/uploads/2025/07/image.jpg',
       },
     ],
   },
@@ -401,6 +496,7 @@ export const DEFAULT_CMS_CONTENT: CMSContentSchema = {
         excerpt: 'Analyse stratégique sur la valeur intangible des marques et les nouveaux leviers de croissance multi-marketplace.',
         content: 'Dans un contexte d’incertitude économique globale, la réputation et le contrôle systémique des canaux de vente deviennent les piliers essentiels de toute marque leader...',
         status: 'published',
+        canonicalUrl: 'https://catzt.com/actualites/reputation-actif-strategique-dirigeants-2026',
       },
       {
         id: 'news-2',
@@ -414,6 +510,7 @@ export const DEFAULT_CMS_CONTENT: CMSContentSchema = {
         excerpt: 'Comment les marques européennes unifient leurs opérations TikTok Shop, Shopee et e-commerce via Catzt Office.',
         content: 'L’unification des opérations marketplace permet de réduire les frictions logistiques et d’automatiser les conversions à grande échelle...',
         status: 'published',
+        canonicalUrl: 'https://catzt.com/actualites/deploiement-infrastructure-controle-systemique',
       },
     ],
   },
@@ -424,11 +521,11 @@ export const DEFAULT_CMS_CONTENT: CMSContentSchema = {
     bannerImageUrl: '/wp-content/uploads/2025/12/omnicom-nousrejoindre-1.jpg',
   },
   contact: {
-    headline: 'Punya pertanyaan atau ingin mendiskusikan kebutuhan operasional bisnis Anda?',
-    officeCity: 'Tangerang',
-    officeAddress: 'Tangerang, Indonesia',
-    telephone: '+62 858 7711 1559',
-    email: 'hello@catzt.com',
+    headline: 'Vous avez une question, un projet ou un enjeu stratégique ?',
+    officeCity: 'Paris',
+    officeAddress: '73-75 rue la Condamine, 75017 Paris',
+    telephone: '+33 (0)1 53 32 60 00',
+    email: 'contact@catztoffice.com',
   },
 };
 
@@ -447,6 +544,7 @@ export class CMSContentStore {
         return {
           ...DEFAULT_CMS_CONTENT,
           ...parsed,
+          integrations: { ...DEFAULT_CMS_CONTENT.integrations, ...(parsed.integrations || {}) },
           pagesSEO: { ...DEFAULT_CMS_CONTENT.pagesSEO, ...(parsed.pagesSEO || {}) },
         };
       }
@@ -464,6 +562,7 @@ export class CMSContentStore {
         return {
           ...DEFAULT_CMS_CONTENT,
           ...parsed,
+          integrations: { ...DEFAULT_CMS_CONTENT.integrations, ...(parsed.integrations || {}) },
           pagesSEO: { ...DEFAULT_CMS_CONTENT.pagesSEO, ...(parsed.pagesSEO || {}) },
         };
       }
@@ -513,7 +612,12 @@ export class CMSContentStore {
     try {
       const parsed = JSON.parse(jsonString);
       if (parsed && parsed.hero && parsed.aPropos) {
-        this.publish({ ...DEFAULT_CMS_CONTENT, ...parsed });
+        this.publish({
+          ...DEFAULT_CMS_CONTENT,
+          ...parsed,
+          integrations: { ...DEFAULT_CMS_CONTENT.integrations, ...(parsed.integrations || {}) },
+          pagesSEO: { ...DEFAULT_CMS_CONTENT.pagesSEO, ...(parsed.pagesSEO || {}) },
+        });
         return true;
       }
     } catch (e) {

@@ -4,6 +4,7 @@ import {
   CMSContentSchema,
   DEFAULT_CMS_CONTENT,
   PageSEOMetadata,
+  TrackingIntegrations,
 } from './cmsContentStore';
 import { AdminAuthModal } from './components/AdminAuthModal';
 import { AdminHeader } from './components/AdminHeader';
@@ -18,6 +19,7 @@ import { NousRejoindreEditor } from './sections/NousRejoindreEditor';
 import { ContactEditor } from './sections/ContactEditor';
 import { GlobalSettingsEditor } from './sections/GlobalSettingsEditor';
 import { MediaLibraryView } from './sections/MediaLibraryView';
+import { SocialIntegrationsEditor } from './sections/SocialIntegrationsEditor';
 
 export const AdminCMSDashboard: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() =>
@@ -49,13 +51,30 @@ export const AdminCMSDashboard: React.FC = () => {
     });
   };
 
-  const handleSEOChange = (pageKey: keyof CMSContentSchema['pagesSEO'], updatedSEO: PageSEOMetadata) => {
+  const handleSEOChange = (
+    pageKey: keyof CMSContentSchema['pagesSEO'],
+    updatedSEO: PageSEOMetadata
+  ) => {
     setFormData((prev) => {
       const updated: CMSContentSchema = {
         ...prev,
         pagesSEO: {
           ...prev.pagesSEO,
           [pageKey]: updatedSEO,
+        },
+      };
+      CMSContentStore.saveDraft(updated);
+      return updated;
+    });
+  };
+
+  const handleIntegrationsChange = (field: keyof TrackingIntegrations, value: any) => {
+    setFormData((prev) => {
+      const updated: CMSContentSchema = {
+        ...prev,
+        integrations: {
+          ...prev.integrations,
+          [field]: value,
         },
       };
       CMSContentStore.saveDraft(updated);
@@ -154,7 +173,9 @@ export const AdminCMSDashboard: React.FC = () => {
         {viewMode !== 'preview' && (
           <main
             className={`overflow-y-auto p-6 md:p-8 bg-[#141414] ${
-              viewMode === 'split' ? 'w-1/2 flex-none max-w-2xl border-r border-gray-800' : 'flex-1 max-w-4xl mx-auto'
+              viewMode === 'split'
+                ? 'w-1/2 flex-none max-w-2xl border-r border-gray-800'
+                : 'flex-1 max-w-4xl mx-auto'
             }`}
           >
             {activeTab === 'hero' && (
@@ -211,6 +232,13 @@ export const AdminCMSDashboard: React.FC = () => {
                 onChange={(f, val) => handleFieldChange('contact', f, val)}
                 onGlobalChange={(f, val) => handleFieldChange('global', f, val)}
                 onSEOChange={(seo) => handleSEOChange('contact', seo)}
+              />
+            )}
+
+            {activeTab === 'seo-hub' && (
+              <SocialIntegrationsEditor
+                formData={formData}
+                onChange={handleIntegrationsChange}
               />
             )}
 

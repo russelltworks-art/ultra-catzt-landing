@@ -1,7 +1,8 @@
 /**
  * Catzt Landing Page Hydrator
- * Connects CMS published and live draft state to DOM nodes dynamically in real-time
- * without disrupting WebGL Three.js canvas or GSAP animations.
+ * Enterprise-grade DOM & SEO Hydration Engine.
+ * Dynamically updates content, Google SERP metadata, OpenGraph cards, Twitter cards,
+ * Schema.org JSON-LD, and verification tags in real-time.
  */
 
 import { CMSContentStore, CMSContentSchema, DEFAULT_CMS_CONTENT, PageSEOMetadata } from '../admin/cmsContentStore';
@@ -41,14 +42,14 @@ export class LandingHydrator {
       }
     });
 
-    console.log('⚡ Catzt Landing Hydrator active: content synced');
+    console.log('⚡ Catzt Landing Hydrator active: SEO & DOM synced');
   }
 
   static applyHydration() {
     const c = this.content;
     if (!c) return;
 
-    // 1. Dynamic SEO & Meta Tag Synchronization
+    // 1. Dynamic SEO, Social Cards, JSON-LD & Verification Tags
     this.applySEO(c);
 
     // 2. Hero & Homepage
@@ -96,16 +97,8 @@ export class LandingHydrator {
 
     // 8. Contact & Footer
     this.setText('[data-cms-key="contact.headline"]', c.contact?.headline);
-    const officeLabel = this.currentLang === 'id' ? 'Kantor Pusat' : 'Headquarters';
-    const contactLabel = this.currentLang === 'id' ? 'Kontak' : 'Contact';
-    this.setHTML(
-      '.wp-block-template-part footer .infos p:nth-child(1)',
-      `<b>${officeLabel}</b><br/>${c.global?.officeAddress || 'Tangerang, Indonesia'}`
-    );
-    this.setHTML(
-      '.wp-block-template-part footer .infos p:nth-child(2)',
-      `<b>${contactLabel}</b><br/>Tel : ${c.global?.contactPhone || '+62 858 7711 1559'}<br/>Email : <a href="mailto:${c.global?.contactEmail || 'hello@catzt.com'}" style="color: inherit; text-decoration: underline;">${c.global?.contactEmail || 'hello@catzt.com'}</a>`
-    );
+    this.setHTML('.wp-block-template-part footer .infos p:nth-child(1)', `<b>Nos bureaux</b><br/>${c.global?.officeAddress || '73-75 rue la Condamine<br>75017 Paris'}`);
+    this.setHTML('.wp-block-template-part footer .infos p:nth-child(2)', `<b>Contact</b><br/>Tel : ${c.global?.contactPhone || '+33 (0)1 53 32 60 00'}`);
     this.setText('.wp-block-omnicom-site-cookie-banner .description', c.global?.cookieBannerText);
   }
 
@@ -125,27 +118,99 @@ export class LandingHydrator {
     const finalTitle = currentSEO?.metaTitle || c.global?.siteTitle || 'Catzt Office';
     const finalDesc = currentSEO?.metaDescription || c.global?.siteTitle;
     const finalImage = currentSEO?.ogImage || '/images/Catzt-logo.png';
+    const canonical = currentSEO?.canonicalUrl || `https://catzt.com${path}`;
 
     // 1. Document Title
     if (document.title !== finalTitle) {
       document.title = finalTitle;
     }
 
-    // 2. Meta Description
+    // 2. Meta Description & Keywords
     if (finalDesc) {
-      let descMeta = document.querySelector('meta[name="description"]');
-      if (!descMeta) {
-        descMeta = document.createElement('meta');
-        descMeta.setAttribute('name', 'description');
-        document.head.appendChild(descMeta);
-      }
-      descMeta.setAttribute('content', finalDesc);
+      this.setMetaName('description', finalDesc);
+    }
+    if (currentSEO?.keywords) {
+      this.setMetaName('keywords', currentSEO.keywords);
     }
 
-    // 3. Open Graph Tags
+    // 3. Canonical Tag
+    let canEl = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+    if (!canEl) {
+      canEl = document.createElement('link');
+      canEl.setAttribute('rel', 'canonical');
+      document.head.appendChild(canEl);
+    }
+    canEl.setAttribute('href', canonical);
+
+    // 4. Open Graph Social Tags (Meta, Facebook, LinkedIn)
     this.setMetaProperty('og:title', finalTitle);
+    this.setMetaProperty('og:site_name', c.global?.brandName || 'Catzt Office');
+    this.setMetaProperty('og:url', canonical);
+    this.setMetaProperty('og:type', path.includes('actualites') ? 'article' : 'website');
     if (finalDesc) this.setMetaProperty('og:description', finalDesc);
     if (finalImage) this.setMetaProperty('og:image', finalImage);
+
+    // 5. Twitter / X Card Tags
+    this.setMetaName('twitter:card', currentSEO?.twitterCardType || 'summary_large_image');
+    this.setMetaName('twitter:title', finalTitle);
+    if (finalDesc) this.setMetaName('twitter:description', finalDesc);
+    if (finalImage) this.setMetaName('twitter:image', finalImage);
+    this.setMetaName('twitter:site', '@catztoffice');
+
+    // 6. Search Console & Meta Domain Verification Tags
+    if (c.integrations?.googleSearchConsoleVerification) {
+      this.setMetaName('google-site-verification', c.integrations.googleSearchConsoleVerification.replace(/^google-site-verification=/, ''));
+    }
+    if (c.integrations?.metaDomainVerification) {
+      this.setMetaName('facebook-domain-verification', c.integrations.metaDomainVerification);
+    }
+
+    // 7. Dynamic Schema.org JSON-LD Injection
+    this.injectJSONLD(c, currentSEO, canonical);
+  }
+
+  private static injectJSONLD(c: CMSContentSchema, seo?: PageSEOMetadata, canonicalUrl?: string) {
+    const existing = document.getElementById('catzt-schema-jsonld');
+    if (existing) existing.remove();
+
+    const schemaData = {
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'Organization',
+          '@id': 'https://catzt.com/#organization',
+          name: c.global?.brandName || 'Catzt Office',
+          url: 'https://catzt.com',
+          logo: 'https://catzt.com/images/Catzt-logo.png',
+          sameAs: [
+            'https://twitter.com/catztoffice',
+            'https://linkedin.com/company/catzt',
+            'https://tiktok.com/@catztoffice',
+            'https://instagram.com/catztoffice',
+          ],
+          contactPoint: {
+            '@type': 'ContactPoint',
+            telephone: c.global?.contactPhone || '+33 1 53 32 60 00',
+            contactType: 'customer service',
+            email: c.global?.contactEmail || 'contact@catztoffice.com',
+          },
+        },
+        {
+          '@type': seo?.schemaType || 'WebSite',
+          '@id': `${canonicalUrl || 'https://catzt.com'}#primary`,
+          url: canonicalUrl || 'https://catzt.com',
+          name: seo?.metaTitle || c.global?.siteTitle || 'Catzt Office',
+          description: seo?.metaDescription || '',
+          publisher: { '@id': 'https://catzt.com/#organization' },
+        },
+      ],
+    };
+
+    const script = document.createElement('script');
+    script.id = 'catzt-schema-jsonld';
+    script.type = 'application/ld+json';
+    script.text = JSON.stringify(schemaData);
+    document.head.appendChild(script);
   }
 
   private static setMetaProperty(prop: string, value: string) {
@@ -153,6 +218,16 @@ export class LandingHydrator {
     if (!el) {
       el = document.createElement('meta');
       el.setAttribute('property', prop);
+      document.head.appendChild(el);
+    }
+    el.setAttribute('content', value);
+  }
+
+  private static setMetaName(name: string, value: string) {
+    let el = document.querySelector(`meta[name="${name}"]`);
+    if (!el) {
+      el = document.createElement('meta');
+      el.setAttribute('name', name);
       document.head.appendChild(el);
     }
     el.setAttribute('content', value);
